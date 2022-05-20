@@ -194,7 +194,7 @@ $hang = array(
                     </div>
                 </form>
             </div>
-            <div class="col border-left ml-4 pl-4">
+            <div class="col border-left ml-4 ">
                 <?php 
                     if($rightGuess === FALSE || $_SESSION["rightGuess"] === FALSE) {
                         $_SESSION["WrongGuesses"]++;
@@ -212,20 +212,21 @@ $hang = array(
         <h1 class = "text-center mt-4 mb-4"> 
             <?php 
 
-
-                // for($i = 0; $i < $wordCount; $i++) {
-                //     if($guess === $_SESSION["WordArray"][$i]) {
-
-                //     }
-                // }
-
-
-                echo implode("&nbsp;&nbsp",$_SESSION["WordArray"]);
+                echo implode("&nbsp;&nbsp",$_SESSION["WordArray"]) . "<br>"
             ?>
         </h1>
+        <div class="text-center mx-auto text-muted font-italic mt-2">Guess the<?php echo $space . $wordCount . $space; ?> letter word</div>
         <br>
         <hr>
+    <h1 class = "text-center font-italic text-muted mt-4">
+        <?php 
+        //quotes from kanye rest api
+        $Quote = file_get_contents("https://api.kanye.rest");
+        $Quote = json_decode($Quote);
 
+        echo "\"".$Quote->quote . "\"<br>" . "~api.kanye.rest";
+         ?>
+    </h1>
     </div>
 
 
