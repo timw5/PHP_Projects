@@ -5,15 +5,14 @@
     if($_SESSION["LoggedIn"] === FALSE) {
         header("location: Login.php");
     }
-
     $letterCount = intval($_SESSION["LetterCount"]);
-    
     $conn = new mysqli($servername, $username, $password, $dbname);
     if ($conn->connect_error) 
     {
         die("Connection failed: " . $conn->connect_error);
     }
 
+    //	ScoreID	Word Count TotalGuesses	RightGuesses, User
     $sql = "SELECT * FROM HighScores WHERE Count = $letterCount ORDER BY Count / TotalGuesses desc LIMIT 10";
     $result = $conn->query($sql);
     $rows = array();
