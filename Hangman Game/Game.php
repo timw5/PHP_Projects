@@ -220,12 +220,26 @@ $hang = array(
         <hr>
     <h1 class = "text-center font-italic text-muted mt-4">
         <?php 
-        //quotes from kanye rest api
-        $Quote = file_get_contents("https://api.kanye.rest");
-        $Quote = json_decode($Quote);
+            if($wrongGuesses < 6) {
+                //quotes from kanye rest api
+                $Quote = file_get_contents("https://api.kanye.rest");
+                $Quote = json_decode($Quote);
 
-        echo "\"".$Quote->quote . "\"<br>" . "~api.kanye.rest";
+                echo "\"".$Quote->quote . "\"<br>" . "~api.kanye.rest<br>";
+            }
+            else {
+                //hint
+                $dictionary = file_get_contents("https://api.dictionaryapi.dev/api/v2/entries/en/" . $word);
+
+                $json = json_decode($dictionary, TRUE);
+    
+                $definition = $json[0]["meanings"][0]["definitions"][0]["definition"];
+                
+                $definition = str_ireplace("hello"," ",$definition);
+                echo "HINT:<br>" . $definition;
+            }
          ?>
+       
     </h1>
     </div>
 

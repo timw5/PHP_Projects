@@ -37,7 +37,7 @@
 <div class="container mx-auto-mt-4">
 
 
-    <table class="table mx-auto border mt-4">
+    <table class="table mx-auto border mt-4 w-50">
         <h1 class = "text-center mt-4 mb-4"> Leaderboard </h1>
         <thead>
             <tr>

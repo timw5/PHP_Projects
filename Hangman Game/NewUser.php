@@ -9,6 +9,7 @@
     $_SESSION["PassValid"] = TRUE;
     
     //if this is our first time visiting this page
+    //
     if($user != NULL && $pass != NULL && $passConf != NULL) 
     {
         //get the length of the password to 
@@ -51,6 +52,7 @@
             //then kick "LoggedIn" to true.
             if ($conn->query($sql) === TRUE) 
             {
+                //all of this is required for the game to start
                 $sql = 
                 "SELECT Word, LetterCount FROM WordList ORDER BY RAND() LIMIT 1;";
                 $result = $conn->query($sql);
@@ -64,10 +66,12 @@
                 }
                 $_SESSION["User"] = $user;
                 $_SESSION["LetterCount"] = $letterCount;
-                $_SESSION["LoggedIn"] = TRUE;
                 $_SESSION["RightGuesses"] = 0;
                 $_SESSION["WrongGuesses"] = 0;
+                //**** */
+
                 //redirect to game
+                $_SESSION["LoggedIn"] = TRUE;
                 header("location: Game.php");
                 exit;
             } 
