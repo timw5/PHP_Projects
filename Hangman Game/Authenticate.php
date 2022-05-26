@@ -20,6 +20,7 @@
     //information
     if( $result->num_rows > 0) 
     {
+        
         $row = $result->fetch_assoc();
         $hash = $row["Hash"];
         $salt = $row["Salt"];
@@ -41,7 +42,7 @@
             $letterCount = $row["LetterCount"];
             $_SESSION["User"] = $user;
             $_SESSION["RightGuesses"] = 0;
-
+            $_SESSION["LettersWrong"] = " ";
             $_SESSION["WordArray"] = array();
             for($i = 0; $i < $letterCount; $i++) {
                 $_SESSION["WordArray"][$i] .= "_";

@@ -2,7 +2,8 @@
     session_start();
     include("ConnectionInfo.php");
     
-    if($_SESSION["LoggedIn"] === FALSE) {
+    if($_SESSION["LoggedIn"] === FALSE || $_SESSION["LoggedIn"] == NULL || $_SESSION["LetterCount"] == 0 || $_SESSION["LetterCount"] == NULL) {
+        $_SESSION["LoggedIn"] = FALSE;
         header("location: Login.php");
     }
     $letterCount = intval($_SESSION["LetterCount"]);
@@ -70,13 +71,18 @@
         <h4 class = "text-center"> 
             The word was "<?php echo $_SESSION["Word"] . "\".<br>"; ?> 
         </h4>
-        <p class = "text-center"> 
-            Want to Play Again?
-            <a href="playagain.php">click Here </a>
+        <p class = "text-center mt-4 mb-4"> 
         </p>
         <div class="w-50 text-center mx-auto">
-            <a class="btn btn-danger mt-4 mx-auto" href="Login.php" role="button">Logout</a>
-        </div>
+        <a class = "btn btn-success mr-4" href="playagain.php">Play Again </a>
+
+        <a class="btn btn-danger" href="?sendcode2=true" role="button">Logout</a>
+            <?php 
+            if(isset($_GET['sendcode2'])) {
+                resetSession();
+            }        
+            ?>
+            </div>
     </div>
 
 </div>

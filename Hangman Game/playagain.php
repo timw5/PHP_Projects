@@ -4,7 +4,7 @@ include("ConnectionInfo.php");
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 $LoggedIn = $_SESSION["LoggedIn"];
-
+$_SESSION["LettersWrong"] = " ";
 
 // Check connection
 if ($conn->connect_error) {

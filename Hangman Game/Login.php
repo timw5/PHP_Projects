@@ -57,6 +57,8 @@
         session_unset();
         //destroy session
         session_destroy();
+        session_start();
+        $_SESSION["LoggedIn"] = FALSE;
         }
     ?>
 

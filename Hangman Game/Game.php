@@ -2,45 +2,55 @@
 session_start();
 include("ConnectionInfo.php");
 
-$loggedIn = $_SESSION["LoggedIn"];
-if($loggedIn === FALSE || $loggedIn === NULL) {
+if($_SESSION["LoggedIn"] === FALSE || $_SESSION["LoggedIn"] == NULL) {
     header("location: Login.php");
 }
+
 $user = $_SESSION["User"];
 $space = "&nbsp;";
 $wordCount = intval($_SESSION["LetterCount"]);
 $word = $_SESSION["Word"];
-
 $wrongGuesses = intval($_SESSION["WrongGuesses"]);
 $rightGuesses = intval($_SESSION["RightGuesses"]);
-$guess = substr($_POST["Guess"], 0, 1);
+$test= substr($_POST["Guess"], 0, 1);
+$_SESSION["rightGuess"] = FALSE;
+$rightGuess = FALSE;
+
+if(ctype_alpha($test) === FALSE && isset($_POST["Guess"])) {
+    $guess = "~";
+    header("location: Game.php");
+}
+else {
+    $guess = $test;
+}
 if($guess === NULL || $_SESSION["WrongGuesses"] === NULL) {
     $_SESSION["WrongGuesses"] = 0;
 }
 
-$_SESSION["rightGuess"] = FALSE;
-$rightGuess = FALSE;
+
 
 $offset = 0;
-while(($pos = stripos($_SESSION["Word"], $guess, $offset))!== FALSE) {
-    $_SESSION["WordArray"][$pos] = $guess;
-    $offset = $pos+1;
-    $_SESSION["rightGuess"] = TRUE;
-    $rightGuess = TRUE;
-    $_SESSION["RightGuesses"]++;
-    $rightGuesses++;
-}
+    while(($pos = stripos($_SESSION["Word"], $guess, $offset))!== FALSE) {
+        if(stripos($_SESSION["LettersWrong"], $guess) !== FALSE || $guess == "~"){
+            break;
+        }
+        else if(exists($_SESSION["WordArray"], $guess)) {
+            $_SESSION["rightGuess"] = TRUE;
+            $rightGuess = TRUE;
+            break;
+        }
+        $_SESSION["WordArray"][$pos] = $guess;
+        $offset = $pos+1;
+        $_SESSION["rightGuess"] = TRUE;
+        $rightGuess = TRUE;
+        $_SESSION["RightGuesses"]++;
+        $rightGuesses++;
+    }
 
-if($rightGuesses == $wordCount || $_SESSION["RightGuesses"] == $_SESSION["LetterCount"]) {
+if($_SESSION["RightGuesses"] == $wordCount) {
+ 
     $_SESSION["endGameMsg"] = "You Won!";
     $_SESSION["LoggedIn"] = FALSE;
-    
-    if($wrongGuesses < 0) {
-        $wrongGuesses = 0;
-    }
-    if($rightGuesses < 0) {
-        $rightGuesses = 0;
-    }
 
     $totalGuesses = $rightGuesses + $wrongGuesses;
 
@@ -66,7 +76,7 @@ if($rightGuesses == $wordCount || $_SESSION["RightGuesses"] == $_SESSION["Letter
 
 }
 
-if($wrongGuesses == 7 || $_SESSION["WrongGuesses"] == 7) {
+if($_SESSION["WrongGuesses"] >= 6) {
     $_SESSION["endGameMsg"] = "You Lost!";
     $_SESSION["LoggedIn"] = TRUE;
     if($wrongGuesses < 0) {
@@ -91,8 +101,18 @@ if($wrongGuesses == 7 || $_SESSION["WrongGuesses"] == 7) {
     
 }
 
+
+function exists(&$arr, $val) {
+    foreach($arr as $i) {
+        if(stripos($i, $val) !== FALSE) {
+            return TRUE;
+        }
+    }
+        return FALSE;
+    
+}
+
 $hang = array(
-'<h3> </h3>',
 
 '<h3><br><br><br><br><br><br>=========</h3> ',
 
@@ -171,6 +191,15 @@ $hang = array(
 );
 
 
+// function resetSession() {
+
+//     session_unset();
+//     session_destroy();
+//     header("location:Login.php");
+// }
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -181,8 +210,15 @@ $hang = array(
     </head>
     <body>
     <div class="container mx-auto mt-4 w-100">
-        <h1 class="text-center mb-4"> Hangman&emsp; <a class="btn btn-danger" href="Login.php" role="button">Logout</a>
- </h1>
+        <h1 class="text-center mb-4"> Hangman&emsp; 
+            <a class="btn btn-danger" href="?sendcode1=true" role="button">Logout</a>
+            <?php 
+            if(isset($_GET['sendcode1'])) {
+                $_SESSION["LoggedIn"] = FALSE;
+                resetSession();
+            }
+            ?>
+        </h1>
         <hr class = "mb-4">
         <div class="row p-4">
             <div class="col text-center mx-auto align-self-center mr-4">
@@ -196,11 +232,14 @@ $hang = array(
             </div>
             <div class="col border-left ml-4 ">
                 <?php 
-                    if($rightGuess === FALSE || $_SESSION["rightGuess"] === FALSE) {
-                        $_SESSION["WrongGuesses"]++;
-                        $wrongGuesses++;
+                    if($_SESSION["rightGuess"] !== TRUE) {
+                        if(isset($_POST["Guess"]) && stripos($_SESSION["LettersWrong"], $guess) === FALSE && $guess != "~") {
+                            $_SESSION["LettersWrong"] .=  $guess . " , ";
+                            $_SESSION["WrongGuesses"]++;
+                        }
                     }
-                    echo $hang[$wrongGuesses];
+                    echo $hang[$_SESSION["WrongGuesses"]];
+                    echo "Wrong Guesses: " . $_SESSION["LettersWrong"]
 
  
                     ?>
@@ -220,7 +259,7 @@ $hang = array(
         <hr>
     <h1 class = "text-center font-italic text-muted mt-4">
         <?php 
-            if($wrongGuesses < 6) {
+            if($_SESSION["WrongGuesses"] < 5) {
                 //quotes from kanye rest api
                 $Quote = file_get_contents("https://api.kanye.rest");
                 $Quote = json_decode($Quote);
@@ -228,15 +267,13 @@ $hang = array(
                 echo "\"".$Quote->quote . "\"<br>" . "~api.kanye.rest<br>";
             }
             else {
-                //hint
                 $dictionary = file_get_contents("https://api.dictionaryapi.dev/api/v2/entries/en/" . $word);
 
                 $json = json_decode($dictionary, TRUE);
     
                 $definition = $json[0]["meanings"][0]["definitions"][0]["definition"];
                 
-                $definition = str_ireplace("hello"," ",$definition);
-                echo "HINT:<br>" . $definition;
+                echo "HINT:<br>" . $definition . "<br><br>";
             }
          ?>
        
